@@ -19,7 +19,7 @@ console = Console(theme=custom_theme)
 
 CONFIG_DIR = os.path.expanduser("~/.consensia")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
-DEFAULT_API_URL = "http://api.consensia.world/cli/analyze-diff" 
+DEFAULT_API_URL = "https://api.consensia.world/cli/analyze-diff" 
 
 def save_config(api_key):
     os.makedirs(CONFIG_DIR, exist_user=True)
