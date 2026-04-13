@@ -50,7 +50,7 @@ def get_git_diff(target=""):
         console.print("[danger]❌ Error: git is not installed or not found in PATH.[/danger]")
         sys.exit(1)
 
-def analyze(mode, target="", output_format="human"):
+def analyze(mode, rounds, target="", output_format="human"):
     config = load_config()
     if not config or "cli_api_key" not in config:
         if output_format == "json":
@@ -77,14 +77,15 @@ def analyze(mode, target="", output_format="human"):
     }
     payload = {
         "diff_text": diff,
-        "mode": mode
+        "mode": mode,
+        "rounds": rounds
     }
 
     try:
         if output_format == "json":
             response = requests.post(DEFAULT_API_URL, json=payload, headers=headers)
         else:
-            with console.status(f"[bold cyan]🔍 Analyzing diff ({len(diff)} chars) in {mode} mode...[/bold cyan]", spinner="dots"):
+            with console.status(f"[bold cyan]🔍 Analyzing diff ({len(diff)} chars) in {mode} mode ({rounds} rounds)...[/bold cyan]", spinner="dots"):
                 response = requests.post(DEFAULT_API_URL, json=payload, headers=headers)
         
         response.raise_for_status()
@@ -131,6 +132,7 @@ def main():
 
     analyze_parser = subparsers.add_parser("analyze", help="Analyze git diff")
     analyze_parser.add_argument("--mode", type=str, choices=["ECONOMY", "BALANCED", "MAX_POWER"], default="BALANCED", help="Power mode")
+    analyze_parser.add_argument("--rounds", type=int, default=2, help="Number of consensus rounds")
     analyze_parser.add_argument("--format", type=str, choices=["human", "json"], default="human", help="Output format (human or json)")
     analyze_parser.add_argument("target", nargs="?", default="", help="Branch or commit to diff against")
 
@@ -139,7 +141,7 @@ def main():
     if args.command == "auth":
         save_config(args.key)
     elif args.command == "analyze":
-        analyze(args.mode, args.target, args.format)
+        analyze(args.mode, args.rounds, args.target, args.format)
     else:
         parser.print_help()
 
